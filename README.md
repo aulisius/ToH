@@ -1,4 +1,4 @@
 ToH
 ===
 
-Tower of Hanoi using C++
+Tower of Hanoi using Java
