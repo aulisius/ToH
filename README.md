@@ -1,5 +1,5 @@
-ToH
-===
+Tower of Hanoi
+==============
 
 CLI Game : Tower of Hanoi using C++  and Java
 
