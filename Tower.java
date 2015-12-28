@@ -1,290 +1,271 @@
 import java.io.*;
 
-class Discstack{
+class discStack {
+
 	int[] discArray = new int[3];
 	int top = 0;
 
-	public boolean isEmpty(){
-		return (top == 0) ? true : false;
-	}
+	public boolean isEmpty(){ return top == 0; }
 
-	public boolean isFull(){
-		return (top == 3) ? true : false;
-	}
-	public void push(int x){
-		if(top<3)
-			discArray[top++] = x;
-	}
-	public int size(){
-		return top;
-	}
-	public void pop(){
-		if(top > 0)
-			top = top-1;
-	}
-	public int peek(){
-		return discArray[top-1];
-	}
+	public boolean isFull(){ return top == 3; }
+
+	public void push(int x) { if (top < 3) discArray[top++] = x; }
+
+	public int size() { return top; }
+
+	public void pop() { if (top > 0) top--; }
+
+	public int peek(){ return discArray[top - 1]; }
 }
 
 class Tower {
-	Discstack A = new Discstack(),B = new Discstack(),C = new Discstack();
-	int sizeA, sizeB, sizeC, ActiveDisc, CurrentDisc, check;
-	static int count;
-	int[] val = {3,2,1};
-	char PickUp, DropOut;
-	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-	public void dispA()	{
+	discStack poleA = new discStack(), 
+			  poleB = new discStack(), 
+			  poleC = new discStack();
+
+	int sizeA, 
+		sizeB, 
+		sizeC,
+		ActiveDisc, 
+		CurrentDisc, 
+		check;
+
+	static int count;
+
+	int[] val = {3, 2, 1};
+
+	char PickUp, 
+		 DropOut;
+
+	public void dispStack(discStack stack)	{
+
 		int a[] = new int[3];
-		int i = 0,j = A.size();
-		if (A.size() > 0) {
-			for (i = (A.size() - 1);i >= 0;i--)
-			{
-				a[i] = A.peek(); 
-				A.pop();
+
+		int size = stack.size();
+
+		if (size > 0) {
+
+			for (int i = (size - 1); i >= 0; i--) {
+
+				a[i] = stack.peek (); 
+				stack.pop ();
+
 			}
-			for (i = 0;i <= (j - 1);i++)
-			{
-				System.out.print(a[i] + " ");
-				A.push(a[i]);
+
+			for (int i = 0; i < size; i++) {
+
+				System.out.print (a[i] + " " );
+				stack.push (a[i]);
+
 			}
-			System.out.println("");
+
+			System.out.println ();
 		}
 		else
-			System.out.println("empty");
+			System.out.println ("empty");
 	}
-	public void dispB()	{
-		int a[]= new int[3];
-		int i = 0, j = B.size();
-		if(B.size() >0) {
-			for (i = (B.size() - 1);i >= 0 ;i--)
-			{
-				a[i] = B.peek();
-				B.pop();
-			}
-			for (i = 0 ;i <= (j - 1);i++)
-			{
-				System.out.print(a[i] + " ");
-				B.push(a[i]);
-			}
-			System.out.println(" ");
-		}
-		else
-			System.out.println("empty");
-	}
-	public void dispC()	{
-		int a[]= new int[3];
-		int i = 0, j = C.size();
-		if(C.size()>0) {
-			for (i = (C.size() - 1);i >= 0 ;i--)
-			{
-				a[i] = C.peek();
-				C.pop();
-			}
-			for (i = 0;i <= (j - 1) ;i++)
-			{
-				System.out.print(a[i] + " ");
-				C.push(a[i]);
-			}
-			System.out.println(" ");
-		}
-		else
-			System.out.println("empty");
-	}
-	public void userInput()	{
+
+	public void userInput() {
+
 		System.out.print("Enter pole to pick and drop: ");
-		String temp = new String();
-		try{
-			temp = in.readLine();
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		try {
+	
+			String input = br.readLine();
+			input = input.replaceAll("\\s", "");
+
+			if(!input.isEmpty() && input.length() == 2) {
+	
+				PickUp = input.charAt(0);
+				DropOut = input.charAt(1);
+			}
+			else 
+				PickUp = DropOut = ' ';
 		}
-		catch(IOException e){
-			System.out.print("Error" + e);
+		catch(IOException e) {
+			e.printStackTrace();
 		}
-		temp = temp.replaceAll("\\s","");
-		if(!temp.isEmpty() && temp.length() == 2){
-			PickUp = temp.charAt(0);
-			DropOut = temp.charAt(1);
+	}
+
+	public discStack getPole(char poleID) {
+		
+		if(poleID == 'a' || poleID == 'A') return poleA;
+		
+		if(poleID == 'b' || poleID == 'B') return poleB;
+		
+		if(poleID == 'c' || poleID == 'C') return poleC;
+	
+		return null;
+	}
+
+	public void setPole(char poleID, discStack pole) {
+	
+		if(poleID == 'a' || poleID == 'A') poleA = pole;
+		
+		if(poleID == 'b' || poleID == 'B') poleB = pole;
+		
+		if(poleID == 'c' || poleID == 'C') poleC = pole;
+	
+	}
+
+	public boolean discPop() {
+
+		boolean complete = false;
+
+		if (PickUp != DropOut) {
+
+			discStack pole = getPole (PickUp);
+
+			if (pole != null) {
+			
+				if(!pole.isEmpty ()) {
+				
+					ActiveDisc = pole.peek ();
+					pole.pop ();
+					complete = true;
+					setPole (PickUp, pole);
+				}
+				else 
+					System.out.println ("Wrong Input! Pole " + PickUp + " is empty!");
+			
+			}
+			else 
+				System.out.println ("Column not found!");
+		}
+
+		return complete;
+	}
+
+	public boolean discPush() {
+	
+		boolean complete = false;
+		
+		discStack pole = getPole(DropOut);
+		
+		if(pole != null) {
+				if (!pole.isEmpty()) {
+				
+					CurrentDisc = pole.peek();
+					
+					if(CurrentDisc > ActiveDisc) {
+					
+						pole.push(ActiveDisc);
+						complete = true;
+						setPole(DropOut, pole);
+					
+					}
+					else {
+						
+						discStack pickupPole = getPole(PickUp);
+						pickupPole.push(ActiveDisc);
+						setPole(PickUp, pickupPole);
+						
+						System.out.println("Rule Break : " + CurrentDisc + " is less than " + ActiveDisc);
+					}
+				}
+				else {
+					pole.push(ActiveDisc);
+					setPole(DropOut, pole);
+				}
 		}
 		else {
-			PickUp = DropOut = ' ';
-		}
-	}
-	public boolean discPop() {
-		boolean complete = false;
-		if (PickUp != DropOut) {
-			switch (PickUp) {
-				case 'a':
-				case 'A':
-				if (!A.isEmpty()) {
-					ActiveDisc = A.peek();
-					A.pop();
-					complete = true;
-				}
-				else
-					System.out.println("Wrong Input");
-				break;
-				case 'b':
-				case 'B':
-				if (!B.isEmpty()) {
-					ActiveDisc = B.peek();
-					B.pop();
-					complete = true;
-				}
-				else
-					System.out.println("Wrong Input");
-				break;
-				case 'c':
-				case 'C':
-				if (!C.isEmpty()) {
-					ActiveDisc = C.peek();
-					C.pop();
-					complete = true;
-				}
-				else
-					System.out.println("Wrong Input");
-				break;
-				default:
-				System.out.println("Column not found");
-			}
-		}
-		return complete;
-	}
-	public boolean discPush() {
-		boolean complete = false;
-		switch (DropOut) {
-			case 'a' :
-			case 'A' :
-			if (!A.isEmpty()) {
-				CurrentDisc = A.peek();
-				if(CurrentDisc > ActiveDisc) {
-					A.push(ActiveDisc);
-					complete = true;
-				}
-				else {
-					if (PickUp == 'B' || PickUp == 'b')
-						B.push(ActiveDisc);
-					if (PickUp == 'C' || PickUp == 'c')
-						C.push(ActiveDisc);
-					System.out.println("Rule Break : " + CurrentDisc + " is smaller than " + ActiveDisc);
-				}
-			}
-			else
-				A.push(ActiveDisc);
-			break;
-			case 'b' :
-			case 'B' :
-			if (!B.isEmpty()) {
-				CurrentDisc = B.peek();
-				if(CurrentDisc > ActiveDisc) {
-					B.push(ActiveDisc);
-					complete = true;
-				}
-				else {
-					if (PickUp == 'C' || PickUp == 'c')
-						B.push(ActiveDisc);
-					if (PickUp == 'A' || PickUp == 'a')
-						A.push(ActiveDisc);
-					System.out.println("Rule Break : " + CurrentDisc + " is smaller than " + ActiveDisc);
-				}
-			}
-			else
-				B.push(ActiveDisc);
-			break;
-			case 'c' :
-			case 'C' :
-			if (!C.isEmpty()) {
-				CurrentDisc = C.peek();
-				if (CurrentDisc > ActiveDisc) {
-					C.push(ActiveDisc);
-					complete = true;
-				}
-				else {
-					if (PickUp == 'A' || PickUp == 'a')
-						A.push(ActiveDisc);
-					if(PickUp == 'B' || PickUp == 'b')
-						B.push(ActiveDisc);
-					System.out.println("Rule Break : " + CurrentDisc + " is smaller than " + ActiveDisc);
-				}
-			}
-			else
-				C.push(ActiveDisc);
-			break;
-			default:
-			System.out.println("Error 404:Column not found");
-			if(PickUp == 'C' || PickUp == 'c')
-				C.push(ActiveDisc);
-			if (PickUp == 'A' || PickUp == 'a')
-				A.push(ActiveDisc);
-			if(PickUp == 'B' || PickUp == 'b')
-				B.push(ActiveDisc);
+				
+			System.out.println("Column not found!");
+			
+			discStack temp = getPole(PickUp);
+			temp.push(ActiveDisc);
+
+			setPole(PickUp, temp);
 
 		}
+	
 		return complete;
+	
 	}
+
 	public boolean checkResult() {
-		int a[] = new int[3], i, j;
+	
+		int a[] = new int[3];
+		
 		check = 0;
-		j = C.size();
-		if ((!C.isEmpty()) && (j == 3)) {
-			for (i = (C.size() - 1);i >= 0;i--) {
-				a[i] = C.peek();
-				C.pop();
+		
+		int size = poleC.size();
+		if (!poleC.isEmpty () && size == 3) {
+		
+			for (int i = size - 1; i >= 0; i--) {
+			
+				a[i] = poleC.peek ();
+				poleC.pop ();
+
 			}
-			for (i = 0;i < j;i++)
-				C.push(a[i]);
-			for (i = 0;i < 3;i++) {
+			
+			for (int i = 0; i < size; i++) poleC.push (a[i]);
+			
+			for (int i = 0; i < 3; i++) 			
 				if (a[i] == val[i])
 					check++;
-			}
+			
 		}
-		return (check == 3) ? true : false ;
+
+		return check == 3;
 	}
-	public static void move() {
-		count++;
-	}
-	public boolean result() {
-		System.out.println("The game is over");
-		System.out.println("Total moves :" + count);
+
+	public static void move() { count++; }
+
+	public void result() {
+	
+		System.out.println("The game is over!");
+		
+		System.out.println("Total moves: " + count);
+		
 		if (count <= 7)
-			System.out.println("Wow ! You are good at this");
+			System.out.println("Wow! You are good at this!");
 		else if (count <= 13)
 			System.out.println("Not bad, mate");
 		else
 			System.out.println("Err...you have no idea what to do, do you?");
-		return false;
 	}
+
 	public void displayTower() {
-		System.out.print("A : ");
-		dispA();
-		System.out.print("B : ");
-		dispB();
-		System.out.print("C : ");
-		dispC();
+		
+		System.out.print("Pole A: ");
+		dispStack (poleA);
+
+		System.out.print("Pole B: ");
+		dispStack (poleB);
+		
+		System.out.print("Pole C: ");
+		dispStack (poleC);
+
 	}
+
 	public void setGame() {
-		A.push(3);
-		A.push(2);
-		A.push(1);
+		poleA.push (3);
+		poleA.push (2);
+		poleA.push (1);
 	}
 
 	public static void main(String[] args) {
-		boolean i,j,k,l = true;
-		Tower One = new Tower();
-		One.setGame();
-		One.displayTower();
-		while (l) {
-			k = false;
-			One.userInput();
-			i =  One.discPop();
-			if (i) {
-				j = One.discPush();
-				new Tower().move();
+	
+		Tower tower = new Tower ();
+		
+		tower.setGame ();
+		tower.displayTower ();
+		
+		while (!tower.checkResult ()) {
+		
+			tower.userInput();
+			
+			if (tower.discPop ()) {
+				tower.discPush ();
+				move ();
 			}
-			One.displayTower();
-			k = One.checkResult();
-			if (k)
-				l = One.result();
+
+			tower.displayTower ();
 		}
+
+		tower.result();
 	}
 }
